@@ -39,8 +39,34 @@ Según lo requerido por la cátedra, este repositorio contiene:
     - Diagramas de secuencia para "Confirmar compra" y "Cambiar estado de pedido".
 + Código Fuente: Implementación completa en Java con comentarios para facilitar su comprensión. 
 
-## Ejecución
-Para correr el proyecto localmente:
-1. Clonar el repositorio.
-2. Importar como proyecto Maven/Gradle o proyecto Java estándar en su IDE (IntelliJ, Eclipse, etc.).
-3. Ejecutar la clase principal Main.java.
+## Guía de Inicio Rápido para Desarrolladores
+
+Para levantar este proyecto localmente, por favor sigue estos pasos cuidadosamente. Si intentas correr la aplicación de inmediato, se detendrá al no encontrar las credenciales de la base de datos.
+
+### 1. Requisitos Previos (Instalaciones necesarias)
+* **Java JDK 21:** El proyecto está configurado para trabajar con Java 21. Asegúrate de tener esta versión instalada y seleccionada como SDK en IntelliJ.
+* **Motor MySQL:** Debes tener MySQL corriendo localmente en tu computadora (puedes usar XAMPP).
+* *Nota sobre Maven:* **NO necesitas instalar Maven.** El proyecto incluye el archivo `mvnw` (Maven Wrapper), el cual se encargará de descargar y utilizar la versión correcta automáticamente de forma transparente.
+
+### 2. Configuración Local (`application.properties`)
+Una vez que abras el proyecto, IntelliJ comenzará a descargar las dependencias automáticamente. Mientras esto ocurre, debes configurar la conexión a tu base de datos local.
+
+Navega hasta el archivo `src/main/resources/application.properties` y agrega la siguiente configuración, reemplazando el usuario y contraseña con tus credenciales locales de MySQL:
+
+```properties
+# Nombre de la aplicación
+spring.application.name=emarket
+
+# Puerto del servidor
+server.port=8080
+
+# Conexión a la base de datos MySQL
+spring.datasource.url=jdbc:mysql://localhost:3306/emarket_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# Configuración de Hibernate (Mapeo de objetos a tablas)
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
