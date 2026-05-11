@@ -45,7 +45,7 @@ Para levantar este proyecto localmente, por favor sigue estos pasos cuidadosamen
 
 ### 1. Requisitos Previos (Instalaciones necesarias)
 * **Java JDK 21:** El proyecto está configurado para trabajar con Java 21. Asegúrate de tener esta versión instalada y seleccionada como SDK en IntelliJ.
-* **Motor MySQL:** Debes tener MySQL corriendo localmente en tu computadora (puedes usar XAMPP).
+* **Motor MySQL:** Debes tener MySQL corriendo localmente en tu computadora (puedes usar XAMPP o Docker Desktop).
 * *Nota sobre Maven:* **NO necesitas instalar Maven.** El proyecto incluye el archivo `mvnw` (Maven Wrapper), el cual se encargará de descargar y utilizar la versión correcta automáticamente de forma transparente.
 
 ### 2. Configuración Local (`application.properties`)
