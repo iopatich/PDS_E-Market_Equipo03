@@ -4,7 +4,7 @@
 Este proyecto consiste en el diseño y desarrollo de una aplicación de comercio electrónico robusta, desarrollada íntegramente en Java. 
 El objetivo principal es aplicar conceptos avanzados de Análisis y Diseño Orientado a Objetos (ADOO), modelado mediante diagramas UML y la implementación de patrones de diseño específicos.  
 
-##👥 Integrantes del Grupo
+## 👥 Integrantes del Grupo
 + Antonio Wu
 + Ignacio Opatich
 + Delfina Francisco Frate
