@@ -92,3 +92,69 @@ Abre Postman y apunta tus peticiones a la dirección base: `http://localhost:808
 4. **POST** `/variantesproducto` (Crea una variante de color y stock para el producto).
 5. **PUT** `/variantesproducto/reducirstock/{id}?cantidad=2` (Prueba la lógica de negocio simulando una compra que descuenta stock).
 6. **DELETE** `/productos/{id}` (Comprueba la baja lógica; el producto ya no aparecerá en los `GET` pero si lo revisas en Adminer, verás que sigue en la base de datos con estado=false).
+
+## 🌿 Flujo de Trabajo y Manejo de Ramas (Git Workflow)
+
+Para mantener el código ordenado y evitar conflictos al trabajar en equipo, nos manejaremos bajo las siguientes reglas estrictas:
+
+🚨 **REGLA DE ORO: NUNCA se debe trabajar ni hacer commits directamente sobre la rama `main`.** La rama `main` es sagrada y solo contendrá el código 100% estable para las entregas a los profesores.
+
+Nuestra rama principal de integración diaria será **`develop`**.
+
+### 🛠️ ¿Cómo trabajar en una nueva funcionalidad? (Paso a paso)
+La mejor práctica para no pisarnos el código es que cada uno cree una rama nueva (feature branch) a partir de `develop` para hacer su tarea, y luego la fusione (merge) cuando esté terminada.
+
+**1. Actualiza tu entorno local**
+Antes de empezar a programar, asegúrate de estar en `develop` y tener la última versión:
+```bash
+git checkout develop
+git pull origin develop
+```
+**2. Crea tu rama de trabajo**
+Crea una rama con un nombre descriptivo tuyo para que la identifiques
+```
+git checkout -b branch/{nombre}
+```
+
+**3. Trabaja y haz tus commits**
+Escribe tu código, prueba que funcione y guarda los cambios usando los Conventional Commits:
+```
+git add .
+git commit -m "feat: agregar validación de login para clientes"
+```
+
+**4. Fusiona tu trabajo a la rama común (Merge)**
+Una vez que tu tarea está terminada y probada, es hora de enviarla a la rama develop para compartirla con el equipo:
+```
+# Vuelve a la rama develop
+git checkout develop
+
+# Trae posibles cambios que hayan subido tus compañeros mientras programabas
+git pull
+
+# Fusiona tu rama hacia develop
+git merge {nombre de tu rama}
+
+# Sube todo el código actualizado a GitHub
+git push origin develop
+
+# Volver a tu rama
+git checkout {nombre de tu rama}
+
+```
+
+**5. Traer cambios a tu rama**
+En caso de que tus compañeros hayan subido cambios en la rama `develop` y los quieras traer a tu rama, hacer lo siguiente:
+```
+# Vuelve a la rama develop
+git checkout develop
+
+# Trae posibles cambios que hayan subido tus compañeros mientras programabas
+git pull
+
+# Volver a tu rama
+git checkout {nombre de tu rama}
+
+# Fusiona los cambios que hubieron en la rama develop
+git pull origin develop
+```
