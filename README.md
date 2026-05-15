@@ -39,34 +39,56 @@ Según lo requerido por la cátedra, este repositorio contiene:
     - Diagramas de secuencia para "Confirmar compra" y "Cambiar estado de pedido".
 + Código Fuente: Implementación completa en Java con comentarios para facilitar su comprensión. 
 
-## Guía de Inicio Rápido para Desarrolladores
+## 🚀 Guía de Inicio Rápido para Desarrolladores
 
-Para levantar este proyecto localmente, por favor sigue estos pasos cuidadosamente. Si intentas correr la aplicación de inmediato, se detendrá al no encontrar las credenciales de la base de datos.
+El entorno de desarrollo de este proyecto está dockerizado para evitar conflictos de instalación local. Sigue estos pasos para clonar el repositorio y levantar la Base de Datos, el Gestor Web y la API de Spring Boot en minutos.
 
-### 1. Requisitos Previos (Instalaciones necesarias)
-* **Java JDK 21:** El proyecto está configurado para trabajar con Java 21. Asegúrate de tener esta versión instalada y seleccionada como SDK en IntelliJ.
-* **Motor MySQL:** Debes tener MySQL corriendo localmente en tu computadora (puedes usar XAMPP o Docker Desktop).
-* *Nota sobre Maven:* **NO necesitas instalar Maven.** El proyecto incluye el archivo `mvnw` (Maven Wrapper), el cual se encargará de descargar y utilizar la versión correcta automáticamente de forma transparente.
+### 📋 1. Requisitos Previos (Instalaciones necesarias)
+Asegúrate de tener instalados los siguientes programas en tu computadora antes de comenzar:
 
-### 2. Configuración Local (`application.properties`)
-Una vez que abras el proyecto, IntelliJ comenzará a descargar las dependencias automáticamente. Mientras esto ocurre, debes configurar la conexión a tu base de datos local.
+* **[Docker Desktop](https://www.docker.com/products/docker-desktop/)**: Fundamental para levantar los contenedores del proyecto sin necesidad de instalar MySQL localmente.
+* **[Postman](https://www.postman.com/downloads/)**: Lo utilizaremos para realizar las peticiones HTTP y probar la API REST.
+* **[Git](https://git-scm.com/downloads)**: Para clonar el repositorio.
+* **Java 21 e IDE (Opcional)**: Si deseas codear o debugear el backend por fuera de Docker, necesitarás Java 21 y un entorno como IntelliJ IDEA.
 
-Navega hasta el archivo `src/main/resources/application.properties` y agrega la siguiente configuración, reemplazando el usuario y contraseña con tus credenciales locales de MySQL:
+### 📥 2. Clonar el Repositorio
+Abre tu terminal en la carpeta donde quieras clonar y ejecuta:
+```bash
+git clone https://github.com/iopatich/PDS_E-Market_Equipo03.git
+cd emarket
+```
+### ⚙️ 3. Configuración de Variables de Entorno (`.env`)
+Para facilitar el trabajo en equipo y agilizar el desarrollo de este TPO, el archivo `.env` ya se encuentra incluido en el repositorio con todas las credenciales locales preconfiguradas. No necesitas renombrar ni configurar nada; Docker y Spring Boot lo leerán automáticamente. **Asegurarse que este como ".env" y no como "env", lo mismo con ".dockerfile" y no "dockerfile"**
 
-```properties
-# Nombre de la aplicación
-spring.application.name=emarket
+### 🐳 4. Levantar el Entorno con Docker
+Abre la aplicación **Docker Desktop** y espera a que inicie correctamente (el ícono debe estar en verde o decir "Engine running"). Luego, en la terminal ubicada en la raíz del proyecto, ejecuta el siguiente comando:
 
-# Puerto del servidor
-server.port=8080
+`docker-compose up --build`
 
-# Conexión a la base de datos MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/emarket_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+*💡 **Nota:** Este comando leerá el `Dockerfile` para construir la imagen de Spring Boot (descargando las dependencias y compilando el código) y levantará MySQL y Adminer en paralelo. La primera vez puede tardar unos minutos. Cuando veas el logo de Spring y el mensaje indicando que la aplicación arrancó en la terminal, la API estará lista.*
 
-# Configuración de Hibernate (Mapeo de objetos a tablas)
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+
+### 🧪 5. Explorar y Probar la API
+
+Una vez que los contenedores estén corriendo en verde, tendrás acceso a las siguientes herramientas:
+
+#### A. Ver la Base de Datos (Adminer)
+No necesitas instalar DBeaver ni MySQL Workbench. El proyecto incluye un gestor web ligero para la base de datos. Para verificar cómo Hibernate generó tus tablas automáticamente:
+1. Ingresa en tu navegador a: 👉 [http://localhost:8081](http://localhost:8081)
+2. Inicia sesión con los siguientes datos:
+   * **Sistema:** MySQL
+   * **Servidor:** mysql
+   * **Usuario:** appuser
+   * **Contraseña:** secret123
+   * **Base de datos:** emarket_db
+
+#### B. Probar la API (Postman)
+Abre Postman y apunta tus peticiones a la dirección base: `http://localhost:8080/api/`
+
+**Ejemplos de flujo para probar el Catálogo Composite:**
+1. **POST** `/categorias` (Crea la categoría padre, ej: "Living").
+2. **POST** `/categorias` (Crea una subcategoría enviando el `idCategoriaPadre` obtenido en el paso 1).
+3. **POST** `/productos` (Crea un producto asociado a la subcategoría enviando el `idCategoriaPadre`).
+4. **POST** `/variantesproducto` (Crea una variante de color y stock para el producto).
+5. **PUT** `/variantesproducto/reducirstock/{id}?cantidad=2` (Prueba la lógica de negocio simulando una compra que descuenta stock).
+6. **DELETE** `/productos/{id}` (Comprueba la baja lógica; el producto ya no aparecerá en los `GET` pero si lo revisas en Adminer, verás que sigue en la base de datos con estado=false).
