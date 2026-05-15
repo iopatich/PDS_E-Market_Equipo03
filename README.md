@@ -49,7 +49,7 @@ Asegúrate de tener instalados los siguientes programas en tu computadora antes 
 * **[Docker Desktop](https://www.docker.com/products/docker-desktop/)**: Fundamental para levantar los contenedores del proyecto sin necesidad de instalar MySQL localmente.
 * **[Postman](https://www.postman.com/downloads/)**: Lo utilizaremos para realizar las peticiones HTTP y probar la API REST.
 * **[Git](https://git-scm.com/downloads)**: Para clonar el repositorio.
-* **Java 21 e IDE (Opcional)**: Si deseas codear o debugear el backend por fuera de Docker, necesitarás Java 21 y un entorno como IntelliJ IDEA.
+* **[Intellij](https://www.jetbrains.com/es-es/idea/download/?section=windows)**: Si deseas codear o debugear el backend por fuera de Docker, necesitarás Java 21 y un entorno como IntelliJ IDEA.
 
 ### 📥 2. Clonar el Repositorio
 Abre tu terminal en la carpeta donde quieras clonar y ejecuta:
