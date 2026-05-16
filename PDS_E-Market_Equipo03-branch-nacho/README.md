@@ -8,7 +8,7 @@ El objetivo principal es aplicar conceptos avanzados de Análisis y Diseño Orie
 + Antonio Wu
 + Ignacio Opatich
 + Delfina Francisco Frate
-+ Lucas
++ Lucas Puente
 + -
 + -
 + -
