@@ -1,0 +1,56 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+
+    ports:
+      - "${DB_PORT}:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    container_name: adminer
+
+    ports:
+      - "8081:8080"
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  backend:
+    build: .
+    container_name: spring-backend
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    ports:
+      - "${BACK_PORT}:8080"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
