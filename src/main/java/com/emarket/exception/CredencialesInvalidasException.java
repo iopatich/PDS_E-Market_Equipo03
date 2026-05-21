@@ -1,7 +1,7 @@
 package com.emarket.exception;
 
 public class CredencialesInvalidasException extends RuntimeException {
-    public CredencialesInvalidasException(String mensaje) {
-        super(mensaje);
+    public CredencialesInvalidasException(String message) {
+        super(message);
     }
 }

@@ -3,6 +3,7 @@ package com.emarket.service.implementation;
 import com.emarket.dto.categoria.CategoriaRequestDto;
 import com.emarket.dto.categoria.CategoriaResponseDto;
 import com.emarket.entity.Categoria;
+import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.mapper.CategoriaMapper;
 import com.emarket.repository.CategoriaRepository;
 import com.emarket.service.interfaz.CategoriaService;
@@ -20,7 +21,10 @@ public class CategoriaServiceImpl implements CategoriaService {
     public CategoriaResponseDto crear(CategoriaRequestDto dto) {
         Categoria padre = null;
         if (dto.idCategoriaPadre() != null) {
-            padre = categoriaRepo.findById(dto.idCategoriaPadre()).orElseThrow(() -> new RuntimeException("Categoría padre no encontrada"));
+            padre = categoriaRepo.findById(dto.idCategoriaPadre())
+                    .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "No se ha encontrado la categoria con el id" + dto.idCategoriaPadre()
+                    ));
         }
         Categoria guardada = categoriaRepo.save(CategoriaMapper.toEntity(dto, padre));
         return CategoriaMapper.toResponseDto(guardada);

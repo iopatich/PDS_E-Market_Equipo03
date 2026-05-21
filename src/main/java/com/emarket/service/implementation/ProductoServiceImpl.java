@@ -3,6 +3,7 @@ import com.emarket.dto.producto.ProductoRequestDto;
 import com.emarket.dto.producto.ProductoResponseDto;
 import com.emarket.entity.Categoria;
 import com.emarket.entity.Producto;
+import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.mapper.ProductoMapper;
 import com.emarket.repository.CategoriaRepository;
 import com.emarket.repository.ProductoRepository;
@@ -20,7 +21,9 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public ProductoResponseDto crear(ProductoRequestDto dto) {
         Categoria CategoriaPadre = categoriaRepository.findById(dto.idCategoriaPadre())
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "No se ha encontrado la categoria con el id" + dto.idCategoriaPadre()
+                ));
         Producto guardado = productoRepository.save(ProductoMapper.toEntity(dto, CategoriaPadre));
         return ProductoMapper.toResponseDto(guardado);
     }

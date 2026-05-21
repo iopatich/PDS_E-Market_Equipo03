@@ -4,6 +4,8 @@ import com.emarket.dto.varianteProducto.VarianteProductoRequestDto;
 import com.emarket.dto.varianteProducto.VarianteProductoResponseDto;
 import com.emarket.entity.Producto;
 import com.emarket.entity.VarianteProducto;
+import com.emarket.exception.RecursoNoEncontradoException;
+import com.emarket.exception.StockInsuficienteException;
 import com.emarket.mapper.VarianteProductoMapper;
 import com.emarket.repository.ProductoRepository;
 import com.emarket.repository.VarianteProductoRepository;
@@ -50,10 +52,23 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
 
     @Override
     public VarianteProductoResponseDto reducirStock(Long id, Integer cantidad) {
-        VarianteProducto varianteProducto = varianteProductoRepository.findById(id).orElseThrow();
-        if (varianteProducto.getStock() < cantidad) throw new RuntimeException("Stock insuficiente");
-        varianteProducto.setStock(varianteProducto.getStock() - cantidad);
+        VarianteProducto varianteProducto = varianteProductoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "No se ha encontrado la variente de producto con el id " + id
+                ));
+
+        ajustarStock(varianteProducto, cantidad);
+
         VarianteProducto actualizada = varianteProductoRepository.save(varianteProducto);
         return VarianteProductoMapper.toResponseDto(actualizada, calcularPrecioFinal(actualizada));
+    }
+
+    private void ajustarStock(VarianteProducto varianteProducto, Integer cantidad) {
+        if (varianteProducto.getStock() < cantidad) {
+            throw new StockInsuficienteException(
+                    "No hay stock suficiente"
+            );
+        }
+        varianteProducto.setStock(varianteProducto.getStock() - cantidad);
     }
 }

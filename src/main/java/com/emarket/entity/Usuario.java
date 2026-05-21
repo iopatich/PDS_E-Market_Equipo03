@@ -4,11 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Entity
 @Table(name = "usuarios")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
-public class Usuario {
+public abstract class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,16 +22,33 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
-
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 255)
     private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private RolUsuario rol;
 
     @Column(nullable = false)
     private Boolean activo = true;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "usuario_permisos", joinColumns = @JoinColumn(name = "usuario_id"))
+    @Column(name = "permiso")
+    private List<Permiso> permisos = new ArrayList<>();
+
+    public boolean tienePermiso(Permiso permiso) {
+        return permisos != null && permisos.contains(permiso);
+    }
+
+    public void asignarPermisoCliente() {
+        this.permisos = new ArrayList<>(List.of(
+                Permiso.VER_CATALOGO,
+                Permiso.GESTIONAR_CARRITO,
+                Permiso.REALIZAR_COMPRA
+        ));
+    }
+
+    public void asignarPermisoAdministrador() {
+        this.permisos = new ArrayList<>(Arrays.asList(Permiso.values()));
+    }
+
+    public abstract String getTipoUsuario();
 }
