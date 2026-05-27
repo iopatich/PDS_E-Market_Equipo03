@@ -7,9 +7,9 @@ import com.emarket.entity.VarianteProducto;
 import java.util.List;
 
 public interface VarianteProductoService {
-    VarianteProductoResponseDto crear(VarianteProductoRequestDto dto);
+    VarianteProductoResponseDto crear(VarianteProductoRequestDto dto, String token);
     List<VarianteProductoResponseDto> listar();
-    VarianteProductoResponseDto eliminar(Long id);
+    VarianteProductoResponseDto eliminar(Long id, String token);
     Double calcularPrecioFinal(VarianteProducto variante);
-    VarianteProductoResponseDto reducirStock(Long id, Integer cantidad);
+    VarianteProductoResponseDto reducirStock(Long id, Integer cantidad, String token);
 }

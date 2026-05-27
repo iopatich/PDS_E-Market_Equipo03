@@ -18,8 +18,11 @@ public class ProductoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductoResponseDto crear(@Valid @RequestBody ProductoRequestDto dto) {
-        return productoService.crear(dto);
+    public ProductoResponseDto crear(
+            @Valid @RequestBody ProductoRequestDto dto,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        return productoService.crear(dto, authorization);
     }
 
     @GetMapping
@@ -29,8 +32,11 @@ public class ProductoController {
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<ApiResponseDto<ProductoResponseDto>> eliminar(@PathVariable Long id) {
-        ProductoResponseDto productoEliminado = productoService.eliminar(id);
+    public ResponseEntity<ApiResponseDto<ProductoResponseDto>> eliminar(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        ProductoResponseDto productoEliminado = productoService.eliminar(id, authorization);
         return ResponseEntity.ok(new ApiResponseDto<>("Se ha eliminado el producto ", productoEliminado));
     }
 }

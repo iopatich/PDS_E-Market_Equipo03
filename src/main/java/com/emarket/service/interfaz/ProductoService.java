@@ -7,7 +7,7 @@ import com.emarket.dto.producto.ProductoUpdateDto;
 import java.util.List;
 
 public interface ProductoService {
-    ProductoResponseDto crear(ProductoRequestDto dto);
+    ProductoResponseDto crear(ProductoRequestDto dto, String token);
     List<ProductoResponseDto> listar();
-    ProductoResponseDto eliminar(Long id);
+    ProductoResponseDto eliminar(Long id, String token);
 }

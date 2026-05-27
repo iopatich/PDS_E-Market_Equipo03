@@ -8,7 +8,9 @@ import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.exception.StockInsuficienteException;
 import com.emarket.mapper.VarianteProductoMapper;
 import com.emarket.repository.ProductoRepository;
+import com.emarket.entity.Permiso;
 import com.emarket.repository.VarianteProductoRepository;
+import com.emarket.service.interfaz.AuthService;
 import com.emarket.service.interfaz.VarianteProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,9 +22,11 @@ import java.util.List;
 public class VarianteProductoServiceImpl implements VarianteProductoService {
     private final VarianteProductoRepository varianteProductoRepository;
     private final ProductoRepository productoRepository;
+    private final AuthService authService;
 
     @Override
-    public VarianteProductoResponseDto crear(VarianteProductoRequestDto dto) {
+    public VarianteProductoResponseDto crear(VarianteProductoRequestDto dto, String token) {
+        authService.validarPermiso(token, Permiso.CARGAR_PRODUCTO);
         Producto producto = productoRepository.findById(dto.idProducto()).orElseThrow();
         VarianteProducto guardada = varianteProductoRepository.save(VarianteProductoMapper.toEntity(dto, producto));
         return VarianteProductoMapper.toResponseDto(guardada, calcularPrecioFinal(guardada));
@@ -39,7 +43,8 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     }
 
     @Override
-    public VarianteProductoResponseDto eliminar(Long id) {
+    public VarianteProductoResponseDto eliminar(Long id, String token) {
+        authService.validarPermiso(token, Permiso.GESTIONAR_PRODUCTOS);
         VarianteProducto varianteProducto = varianteProductoRepository.findById(id).orElseThrow();
         varianteProducto.setActivo(false);
         return VarianteProductoMapper.toResponseDto(varianteProductoRepository.save(varianteProducto), calcularPrecioFinal(varianteProducto));
@@ -51,7 +56,8 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     }
 
     @Override
-    public VarianteProductoResponseDto reducirStock(Long id, Integer cantidad) {
+    public VarianteProductoResponseDto reducirStock(Long id, Integer cantidad, String token) {
+        authService.validarPermiso(token, Permiso.REALIZAR_COMPRA);
         VarianteProducto varianteProducto = varianteProductoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "No se ha encontrado la variente de producto con el id " + id
