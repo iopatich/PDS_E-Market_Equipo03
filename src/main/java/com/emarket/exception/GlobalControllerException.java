@@ -47,6 +47,12 @@ public class GlobalControllerException {
                 .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage()));
     }
 
+    @ExceptionHandler(OperacionInvalidaException.class)
+    public ResponseEntity<ErrorResponse> manejarOperacionInvalida(OperacionInvalidaException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> manejarValidaciones(MethodArgumentNotValidException exception) {
         Map<String, String> errores = new HashMap<>();
