@@ -1,14 +1,25 @@
 package com.emarket.controller;
-import com.emarket.dto.categoria.CategoriaRequestDto;
-import com.emarket.dto.api.ApiResponseDto;
-import com.emarket.dto.categoria.CategoriaResponseDto;
-import com.emarket.service.interfaz.CategoriaService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.emarket.dto.api.ApiResponseDto;
+import com.emarket.dto.categoria.CategoriaRequestDto;
+import com.emarket.dto.categoria.CategoriaResponseDto;
+import com.emarket.service.interfaz.CategoriaService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/categorias")
@@ -18,8 +29,11 @@ public class CategoriaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoriaResponseDto crear(@Valid @RequestBody CategoriaRequestDto dto) {
-        return categoriaService.crear(dto);
+    public CategoriaResponseDto crear(
+            @Valid @RequestBody CategoriaRequestDto dto,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        return categoriaService.crear(dto, authorization);
     }
 
     @GetMapping
@@ -29,8 +43,11 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<ApiResponseDto<CategoriaResponseDto>> eliminar(@PathVariable Long id) {
-        CategoriaResponseDto CategoriaEliminada = categoriaService.eliminar(id);
+    public ResponseEntity<ApiResponseDto<CategoriaResponseDto>> eliminar(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        CategoriaResponseDto CategoriaEliminada = categoriaService.eliminar(id, authorization);
         return ResponseEntity.ok(new ApiResponseDto<>("Se ha eliminado la categoria ", CategoriaEliminada));
     }
 }
