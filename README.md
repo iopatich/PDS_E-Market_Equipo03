@@ -5,7 +5,6 @@ Este proyecto consiste en el diseño y desarrollo de una aplicación de comercio
 El objetivo principal es aplicar conceptos avanzados de Análisis y Diseño Orientado a Objetos (ADOO), modelado mediante diagramas UML y la implementación de patrones de diseño específicos.  
 
 ## 👥 Integrantes del Grupo
-Integrantes:
 + Antonio Wu | LU: 1162753
 + Ignacio Opatich | LU: 1161666
 + Delfina Francisco Frate | LU: 1149326
