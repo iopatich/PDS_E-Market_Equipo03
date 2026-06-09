@@ -5,13 +5,15 @@ Este proyecto consiste en el diseño y desarrollo de una aplicación de comercio
 El objetivo principal es aplicar conceptos avanzados de Análisis y Diseño Orientado a Objetos (ADOO), modelado mediante diagramas UML y la implementación de patrones de diseño específicos.  
 
 ## 👥 Integrantes del Grupo
-+ Antonio Wu
-+ Ignacio Opatich
-+ Delfina Francisco Frate
-+ Lucas
-+ -
-+ -
-+ -
+Integrantes:
++ Antonio Wu | LU: 1162753
++ Ignacio Opatich | LU: 1161666
++ Delfina Francisco Frate | LU: 1149326
++ Lucas Puente | LU:1153931
++ Valentin Papa | LU: 1197189
++ Juan Manuel Mieres | LU: 1070703
+
+  
 
 ## Requisitos Funcionales
 La aplicación permite gestionar el ciclo de vida de una compra en línea, incluyendo:  
