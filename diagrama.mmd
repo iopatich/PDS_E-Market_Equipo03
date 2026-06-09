@@ -1,114 +1,167 @@
 classDiagram
     direction TB
 
-    %% Patrón Strategy para Pagos
-    class MetodoPago {
-        <<interface>>
-        +pagar(monto: double)
-    }
-    class PagoTarjeta {
-        +pagar(monto: double)
-    }
-    class PagoEfectivo {
-        +pagar(monto: double)
-    }
-    MetodoPago <|.. PagoTarjeta
-    MetodoPago <|.. PagoEfectivo
-
-    %% Patrón State para el Pedido
-    class EstadoPedido {
-        <<interface>>
-        +proximoEstado(pedido: Pedido)
-        +cancelar(pedido: Pedido)
-    }
-    class EstadoPendiente {
-        +proximoEstado(pedido: Pedido)
-    }
-    class EstadoEnviado {
-        +proximoEstado(pedido: Pedido)
-    }
-    EstadoPedido <|.. EstadoPendiente
-    EstadoPedido <|.. EstadoEnviado
-
-    %% Patrón Observer para Notificaciones
-    class Notificable {
-        <<interface>>
-        +actualizar(mensaje: String)
-    }
-    class EmailNotificacion {
-        +actualizar(mensaje: String)
-    }
-    class SMSNotificacion {
-        +actualizar(mensaje: String)
-    }
-    Notificable <|.. EmailNotificacion
-    Notificable <|.. SMSNotificacion
-
-    %% Enumeración de Permisos
-    class Permiso {
-        <<enumeration>>
-        VER_CATALOGO
-        GESTIONAR_CARRITO
-        REALIZAR_COMPRA
-        CARGAR_PRODUCTO
-        GESTIONAR_PRODUCTOS
-        ACTUALIZAR_ESTADO_PEDIDO
-        DAR_ALTA_CLIENTE
-        DAR_BAJA_CLIENTE
-    }
-
-    %% Clases Principales del Dominio
+    %% --------------------------------------------------
+    %% ENTIDADES BASE Y SIMPLE FACTORY (Usuarios)
+    %% --------------------------------------------------
     class Usuario {
-        <<abstract>>
-        -id: int
-        -username: String
-        -password: String
-        -permisos: List~Permiso~
-        +asignarPermisoCliente()
-        +asignarPermisoAdministrador()
+        <<Abstract>>
+        -Long id
+        -String email
+        -String password
+        -Rol rol
     }
     class Cliente {
-        -email: String
+        -String direccion
     }
     class Administrador {
-        +gestionarProducto(producto: Producto)
-        +cargarCliente()
-        +cargarProducto()
-        +darDeBajaCliente(cliente: Cliente)
+        -String legajo
     }
+    class UsuarioFactory {
+        <<Simple Factory>>
+        +crearCliente(dto): Cliente
+        +crearAdministrador(dto): Administrador
+    }
+
     Usuario <|-- Cliente
     Usuario <|-- Administrador
-    
-    class Producto {
-        -id: int
-        -nombre: String
-        -precio: double
-        -stock: int
-        -categoria: Categoria
-    }
+    UsuarioFactory ..> Cliente : crea
+    UsuarioFactory ..> Administrador : crea
 
+    %% --------------------------------------------------
+    %% PATRÓN COMPOSITE (Catálogo de Muebles)
+    %% --------------------------------------------------
+    class ComponenteCatalogo {
+        <<Interface>>
+        +getPrecio(): Double
+        +getNombre(): String
+    }
     class Categoria {
-        -id: int
-        -nombre: String
-        -descripcion: String
+        -String nombre
+        -List~ComponenteCatalogo~ componentes
+        +agregar(ComponenteCatalogo)
+        +eliminar(ComponenteCatalogo)
+        +getPrecio(): Double
+    }
+    class Producto {
+        -String nombre
+        -Double precioBase
+        +getPrecio(): Double
+    }
+    class VarianteProducto {
+        -String color
+        -Integer stock
     }
 
+    ComponenteCatalogo <|.. Categoria
+    ComponenteCatalogo <|.. Producto
+    Categoria o-- ComponenteCatalogo : contiene
+    Producto *-- VarianteProducto : variantes
+
+    %% --------------------------------------------------
+    %% COMPRAS Y PEDIDOS
+    %% --------------------------------------------------
+    class Carrito {
+        -Long id
+        -Double total
+    }
+    class ItemCarrito {
+        -Integer cantidad
+        -Double subtotal
+    }
     class Pedido {
-        -id: int
-        -fecha: Date
-        -total: double
-        -estado: EstadoPedido
-        -suscriptores: List~Notificable~
-        +setEstado(estadoPedido: EstadoPedido)
-        +notificar()
-        +procesarPago(metodo: MetodoPago)
+        -Long id
+        -EstadoPedido estado
+        -Double total
+        +setEstado(EstadoPedido)
+    }
+    class ItemPedido {
+        -Integer cantidad
+        -Double precioUnitario
     }
 
-    %% Relaciones
-    Cliente "1" --> "*" Pedido : realiza
-    Pedido "1" *-- "*" Producto : contiene
-    Pedido --> EstadoPedido : tiene un
-    Pedido --> MetodoPago : usa
-    Pedido o-- Notificable : notifica a
-    Usuario --> Permiso : posee
-    Categoria "1" --> "*" Producto: tiene
+    Cliente "1" -- "1" Carrito : posee
+    Carrito *-- "*" ItemCarrito : ítems
+    ItemCarrito "1" -- "1" VarianteProducto : referencia
+    Cliente "1" -- "*" Pedido : realiza
+    Pedido *-- "*" ItemPedido : ítems
+    ItemPedido "1" -- "1" VarianteProducto : referencia
+
+    %% --------------------------------------------------
+    %% PATRÓN STRATEGY (Métodos de Pago)
+    %% --------------------------------------------------
+    class MetodoPago {
+        <<Strategy>>
+        +procesarPago(Pedido)
+        +getTipo(): TipoPago
+    }
+    class PagoTarjeta {
+        +procesarPago(Pedido)
+    }
+    class PagoEfectivo {
+        +procesarPago(Pedido)
+    }
+    class PagoTransferencia {
+        +procesarPago(Pedido)
+    }
+    class CarritoServiceImpl {
+        <<Context>>
+        -Map~TipoPago, MetodoPago~ metodosPagoMap
+        +confirmarCompra()
+    }
+
+    MetodoPago <|.. PagoTarjeta
+    MetodoPago <|.. PagoEfectivo
+    MetodoPago <|.. PagoTransferencia
+    CarritoServiceImpl ..> MetodoPago : delega pago
+
+    %% --------------------------------------------------
+    %% PATRÓN STATE (Estados del Pedido)
+    %% --------------------------------------------------
+    class EstadoPedidoState {
+        <<State>>
+        +getEstado(): EstadoPedido
+        +siguienteEstado(Pedido): EstadoPedido
+    }
+    class EstadoPedidoPendienteState {
+        +siguienteEstado(Pedido)
+    }
+    class EstadoPedidoPagadoState {
+        +siguienteEstado(Pedido)
+    }
+    class EstadoPedidoEnviadoState {
+        +siguienteEstado(Pedido)
+    }
+    class EstadoPedidoEntregadoState {
+        +siguienteEstado(Pedido)
+    }
+    class EstadoPedidoResolver {
+        -Map~EstadoPedido, EstadoPedidoState~ states
+        +resolve(EstadoPedido): EstadoPedidoState
+    }
+    class PedidoServiceImpl {
+        <<Context / Publisher>>
+        +avanzarEstadoPedido(Long)
+    }
+
+    EstadoPedidoState <|.. EstadoPedidoPendienteState
+    EstadoPedidoState <|.. EstadoPedidoPagadoState
+    EstadoPedidoState <|.. EstadoPedidoEnviadoState
+    EstadoPedidoState <|.. EstadoPedidoEntregadoState
+    EstadoPedidoResolver ..> EstadoPedidoState : resuelve
+    PedidoServiceImpl ..> EstadoPedidoResolver : usa
+
+    %% --------------------------------------------------
+    %% PATRÓN OBSERVER (Notificaciones)
+    %% --------------------------------------------------
+    class PedidoEstadoActualizadoEvent {
+        <<Event>>
+        -Pedido pedido
+    }
+    class NotificacionPedidoListener {
+        <<Observer>>
+        +handlePedidoEstadoActualizadoEvent(Event)
+    }
+
+    PedidoServiceImpl ..> PedidoEstadoActualizadoEvent : publica evento
+    NotificacionPedidoListener ..> PedidoEstadoActualizadoEvent : escucha evento
