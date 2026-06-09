@@ -11,9 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Patrón Factory Method: centraliza la creación de usuarios
- * y la asignación de permisos según el rol.
+ * Patrón Simple Factory: centraliza la creación de usuarios
+ * y la asignación de permisos y contraseñas según el rol.
  */
+
+
+
 @Component
 @RequiredArgsConstructor
 public class UsuarioFactory {
