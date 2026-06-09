@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
  * y la asignación de permisos y contraseñas según el rol.
  */
 
+
+
 @Component
 @RequiredArgsConstructor
 public class UsuarioFactory {
