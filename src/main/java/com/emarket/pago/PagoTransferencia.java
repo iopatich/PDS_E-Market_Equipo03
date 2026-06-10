@@ -4,15 +4,15 @@ import com.emarket.entity.Pedido;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PagoEfectivo implements MetodoPago {
+public class PagoTransferencia implements MetodoPago {
 
     @Override
     public void procesarPago(Pedido pedido) {
-        System.out.println("Pago en efectivo procesado para el pedido " + pedido.getId());
+        System.out.println("Pago por transferencia procesado para el pedido " + pedido.getId());
     }
 
     @Override
     public TipoPago getTipo() {
-        return TipoPago.EFECTIVO;
+        return TipoPago.TRANSFERENCIA;
     }
 }

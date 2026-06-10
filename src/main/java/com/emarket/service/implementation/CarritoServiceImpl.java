@@ -13,6 +13,9 @@ import com.emarket.mapper.CarritoMapper;
 import com.emarket.mapper.PedidoMapper;
 import com.emarket.notificacion.PedidoEstadoActualizadoEvent;
 import com.emarket.pago.MetodoPago;
+import com.emarket.pago.PagoEfectivo;
+import com.emarket.pago.PagoTarjeta;
+import com.emarket.pago.PagoTransferencia;
 import com.emarket.pago.TipoPago;
 import com.emarket.repository.CarritoRepository;
 import com.emarket.repository.ItemCarritoRepository;
@@ -21,15 +24,12 @@ import com.emarket.repository.VarianteProductoRepository;
 import com.emarket.service.interfaz.AuthService;
 import com.emarket.service.interfaz.CarritoService;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,13 +41,8 @@ public class CarritoServiceImpl implements CarritoService {
     private final PedidoRepository pedidoRepository;
     private final AuthService authService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final List<MetodoPago> metodosPago;
-    private final Map<TipoPago, MetodoPago> metodosPagoMap = new EnumMap<>(TipoPago.class);
-
-    @PostConstruct
-    public void initMetodosPago() {
-        metodosPago.forEach(metodo -> metodosPagoMap.put(metodo.getTipo(), metodo));
-    }
+    @Setter
+    private MetodoPago estrategia;
 
     @Override
     @Transactional(readOnly = true)
@@ -116,9 +111,10 @@ public class CarritoServiceImpl implements CarritoService {
             throw new OperacionInvalidaException("No se puede confirmar una compra con el carrito vacio");
         }
 
-        MetodoPago metodo = metodosPagoMap.get(dto.tipoPago());
-        if (metodo == null) {
-            throw new OperacionInvalidaException("El metodo de pago " + dto.tipoPago() + " no esta disponible");
+        switch (dto.tipoPago()) {
+            case TARJETA -> setEstrategia(new PagoTarjeta());
+            case EFECTIVO -> setEstrategia(new PagoEfectivo());
+            case TRANSFERENCIA -> setEstrategia(new PagoTransferencia());
         }
 
         Pedido pedido = new Pedido();
@@ -147,7 +143,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         pedido.setTotal(total);
 
-        metodo.procesarPago(pedido);
+        estrategia.procesarPago(pedido);
         pedido.setEstadoActual(EstadoPedido.PAGADO);
 
         Pedido guardado = pedidoRepository.save(pedido);
