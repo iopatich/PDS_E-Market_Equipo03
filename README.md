@@ -79,9 +79,9 @@ No necesitas instalar DBeaver ni MySQL Workbench. El proyecto incluye un gestor 
 2. Inicia sesión con los siguientes datos:
    * **Sistema:** MySQL
    * **Servidor:** mysql
-   * **Usuario:** appuser
-   * **Contraseña:** secret123
-   * **Base de datos:** emarket_db
+   * **Usuario:** root
+   * **Contraseña:** rootsecret
+   * **Base de datos:** emarket
 
 #### B. Probar la API (Postman)
 Abre Postman y apunta tus peticiones a la dirección base: `http://localhost:8080/api/`
