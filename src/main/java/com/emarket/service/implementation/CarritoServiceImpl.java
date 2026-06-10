@@ -10,7 +10,6 @@ import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.exception.StockInsuficienteException;
 import com.emarket.mapper.CarritoMapper;
 import com.emarket.mapper.PedidoMapper;
-import com.emarket.notificacion.PedidoEstadoActualizadoEvent;
 import com.emarket.repository.CarritoRepository;
 import com.emarket.repository.ItemCarritoRepository;
 import com.emarket.repository.PedidoRepository;
