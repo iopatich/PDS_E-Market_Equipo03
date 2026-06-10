@@ -23,4 +23,6 @@ public abstract class ComponenteCatalogo {
     @ManyToOne
     @JoinColumn(name = "idCategoriaPadre")
     private Categoria categoriaPadre;
+
+    public abstract Double calcularPrecio();
 }

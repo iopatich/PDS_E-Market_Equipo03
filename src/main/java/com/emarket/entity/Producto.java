@@ -19,4 +19,9 @@ public class Producto extends ComponenteCatalogo {
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<VarianteProducto> variantes;
+
+    @Override
+    public Double calcularPrecio() {
+        return this.getPrecioBase();
+    }
 }
