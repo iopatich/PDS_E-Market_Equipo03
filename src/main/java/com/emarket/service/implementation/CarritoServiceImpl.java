@@ -3,6 +3,7 @@ package com.emarket.service.implementation;
 import com.emarket.dto.carrito.ActualizarCantidadCarritoRequestDto;
 import com.emarket.dto.carrito.AgregarItemCarritoRequestDto;
 import com.emarket.dto.carrito.CarritoResponseDto;
+import com.emarket.dto.carrito.ConfirmarCompraRequestDto;
 import com.emarket.dto.pedido.PedidoResponseDto;
 import com.emarket.entity.*;
 import com.emarket.exception.OperacionInvalidaException;
@@ -10,6 +11,9 @@ import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.exception.StockInsuficienteException;
 import com.emarket.mapper.CarritoMapper;
 import com.emarket.mapper.PedidoMapper;
+import com.emarket.notificacion.PedidoEstadoActualizadoEvent;
+import com.emarket.pago.MetodoPago;
+import com.emarket.pago.TipoPago;
 import com.emarket.repository.CarritoRepository;
 import com.emarket.repository.ItemCarritoRepository;
 import com.emarket.repository.PedidoRepository;
@@ -21,7 +25,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +41,13 @@ public class CarritoServiceImpl implements CarritoService {
     private final PedidoRepository pedidoRepository;
     private final AuthService authService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final List<MetodoPago> metodosPago;
+    private final Map<TipoPago, MetodoPago> metodosPagoMap = new EnumMap<>(TipoPago.class);
+
+    @PostConstruct
+    public void initMetodosPago() {
+        metodosPago.forEach(metodo -> metodosPagoMap.put(metodo.getTipo(), metodo));
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -93,12 +108,17 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     @Transactional
-    public PedidoResponseDto confirmarCompra(String token) {
+    public PedidoResponseDto confirmarCompra(String token, ConfirmarCompraRequestDto dto) {
         authService.validarPermiso(token, Permiso.REALIZAR_COMPRA);
         Carrito carrito = obtenerCarritoDelCliente(token);
 
         if (carrito.getItems().isEmpty()) {
             throw new OperacionInvalidaException("No se puede confirmar una compra con el carrito vacio");
+        }
+
+        MetodoPago metodo = metodosPagoMap.get(dto.tipoPago());
+        if (metodo == null) {
+            throw new OperacionInvalidaException("El metodo de pago " + dto.tipoPago() + " no esta disponible");
         }
 
         Pedido pedido = new Pedido();
@@ -126,12 +146,16 @@ public class CarritoServiceImpl implements CarritoService {
         }
 
         pedido.setTotal(total);
+
+        metodo.procesarPago(pedido);
+        pedido.setEstadoActual(EstadoPedido.PAGADO);
+
         Pedido guardado = pedidoRepository.save(pedido);
 
         carrito.getItems().clear();
         carritoRepository.save(carrito);
 
-        publicarCambioEstado(guardado, null, EstadoPedido.PENDIENTE);
+        publicarCambioEstado(guardado, null, EstadoPedido.PAGADO);
         return PedidoMapper.toResponseDto(guardado);
     }
 

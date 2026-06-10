@@ -4,6 +4,7 @@ import com.emarket.dto.api.ApiResponseDto;
 import com.emarket.dto.carrito.ActualizarCantidadCarritoRequestDto;
 import com.emarket.dto.carrito.AgregarItemCarritoRequestDto;
 import com.emarket.dto.carrito.CarritoResponseDto;
+import com.emarket.dto.carrito.ConfirmarCompraRequestDto;
 import com.emarket.dto.pedido.PedidoResponseDto;
 import com.emarket.service.interfaz.CarritoService;
 import jakarta.validation.Valid;
@@ -55,10 +56,11 @@ public class CarritoController {
 
     @PostMapping("/confirmar")
     public ResponseEntity<ApiResponseDto<PedidoResponseDto>> confirmarCompra(
-            @RequestHeader("Authorization") String authorization
+            @RequestHeader("Authorization") String authorization,
+            @Valid @RequestBody ConfirmarCompraRequestDto dto
     ) {
-        PedidoResponseDto pedido = carritoService.confirmarCompra(authorization);
+        PedidoResponseDto pedido = carritoService.confirmarCompra(authorization, dto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseDto<>("Compra confirmada correctamente", pedido));
+                .body(new ApiResponseDto<>("Compra confirmada correctamente. Metodo de pago: " + dto.tipoPago(), pedido));
     }
 }
