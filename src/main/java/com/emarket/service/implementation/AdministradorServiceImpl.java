@@ -8,6 +8,7 @@ import com.emarket.entity.Cliente;
 import com.emarket.entity.Permiso;
 import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.exception.UsuarioYaExisteException;
+import com.emarket.mapper.AdministradorMapper;
 import com.emarket.mapper.ClienteMapper;
 import com.emarket.repository.AdministradorRepository;
 import com.emarket.repository.ClienteRepository;
@@ -15,6 +16,7 @@ import com.emarket.repository.UsuarioRepository;
 import com.emarket.service.interfaz.AdministradorService;
 import com.emarket.service.interfaz.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public class AdministradorServiceImpl implements AdministradorService {
     private final AdministradorRepository administradorRepository;
     private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
-    private final UsuarioFactory usuarioFactory;
+    private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
     @Override
@@ -34,7 +36,12 @@ public class AdministradorServiceImpl implements AdministradorService {
         if (usuarioRepository.existsByUsername(dto.username())) {
             throw new UsuarioYaExisteException("El username ya está registrado");
         }
-        Administrador guardado = administradorRepository.save(usuarioFactory.crearAdministrador(dto));
+
+        Administrador nuevoAdministrador = AdministradorMapper.toEntity(dto);
+        nuevoAdministrador.setPassword(passwordEncoder.encode(dto.password()));
+        nuevoAdministrador.asignarPermisoAdministrador();
+
+        Administrador guardado = administradorRepository.save(nuevoAdministrador);
         return AdministradorMapper.toResponseDto(guardado);
     }
 
