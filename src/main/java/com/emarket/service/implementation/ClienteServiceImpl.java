@@ -12,6 +12,7 @@ import com.emarket.entity.Permiso;
 import com.emarket.service.interfaz.AuthService;
 import com.emarket.service.interfaz.ClienteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public class ClienteServiceImpl implements ClienteService {
     private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final AuthService authService;
-    // Eliminamos la inyección del UsuarioFactory
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ClienteResponseDto registrar(ClienteRequestDto dto) {
@@ -31,8 +33,11 @@ public class ClienteServiceImpl implements ClienteService {
             throw new UsuarioYaExisteException("El username ya está registrado");
         }
 
-        // CORRECCIÓN: La responsabilidad de transformar un DTO a Entidad es del Mapper.
         Cliente nuevoCliente = ClienteMapper.toEntity(dto);
+
+        nuevoCliente.setPassword(passwordEncoder.encode(dto.password()));
+
+        nuevoCliente.asignarPermisoCliente();
 
         Cliente guardado = clienteRepository.save(nuevoCliente);
         return ClienteMapper.toResponseDto(guardado);
