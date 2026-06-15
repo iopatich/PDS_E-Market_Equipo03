@@ -11,9 +11,8 @@ import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.exception.StockInsuficienteException;
 import com.emarket.mapper.CarritoMapper;
 import com.emarket.mapper.PedidoMapper;
-import com.emarket.notificacion.PedidoEstadoActualizadoEvent;
-import com.emarket.pago.MetodoPago;
-import com.emarket.pago.TipoPago;
+import com.emarket.notificacion.SujetoPedido;
+import com.emarket.pago.*;
 import com.emarket.repository.CarritoRepository;
 import com.emarket.repository.ItemCarritoRepository;
 import com.emarket.repository.PedidoRepository;
@@ -21,15 +20,10 @@ import com.emarket.repository.VarianteProductoRepository;
 import com.emarket.service.interfaz.AuthService;
 import com.emarket.service.interfaz.CarritoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -40,14 +34,8 @@ public class CarritoServiceImpl implements CarritoService {
     private final VarianteProductoRepository varianteProductoRepository;
     private final PedidoRepository pedidoRepository;
     private final AuthService authService;
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private final List<MetodoPago> metodosPago;
-    private final Map<TipoPago, MetodoPago> metodosPagoMap = new EnumMap<>(TipoPago.class);
 
-    @PostConstruct
-    public void initMetodosPago() {
-        metodosPago.forEach(metodo -> metodosPagoMap.put(metodo.getTipo(), metodo));
-    }
+    private final SujetoPedido sujetoPedido;
 
     @Override
     @Transactional(readOnly = true)
@@ -116,9 +104,13 @@ public class CarritoServiceImpl implements CarritoService {
             throw new OperacionInvalidaException("No se puede confirmar una compra con el carrito vacio");
         }
 
-        MetodoPago metodo = metodosPagoMap.get(dto.tipoPago());
-        if (metodo == null) {
-            throw new OperacionInvalidaException("El metodo de pago " + dto.tipoPago() + " no esta disponible");
+        ContextoPago contextoPago = new ContextoPago();
+
+        switch (dto.tipoPago()) {
+            case TARJETA -> contextoPago.setEstrategia(new PagoTarjeta());
+            case EFECTIVO -> contextoPago.setEstrategia(new PagoEfectivo());
+            case TRANSFERENCIA -> contextoPago.setEstrategia(new PagoTransferencia());
+            default -> throw new OperacionInvalidaException("El metodo de pago " + dto.tipoPago() + " no esta disponible");
         }
 
         Pedido pedido = new Pedido();
@@ -147,7 +139,8 @@ public class CarritoServiceImpl implements CarritoService {
 
         pedido.setTotal(total);
 
-        metodo.procesarPago(pedido);
+        contextoPago.ejecutarPago(pedido);
+
         pedido.setEstadoActual(EstadoPedido.PAGADO);
 
         Pedido guardado = pedidoRepository.save(pedido);
@@ -155,7 +148,8 @@ public class CarritoServiceImpl implements CarritoService {
         carrito.getItems().clear();
         carritoRepository.save(carrito);
 
-        publicarCambioEstado(guardado, null, EstadoPedido.PAGADO);
+        publicarCambioEstado(guardado, EstadoPedido.PENDIENTE, EstadoPedido.PAGADO);
+
         return PedidoMapper.toResponseDto(guardado);
     }
 
@@ -194,11 +188,11 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void publicarCambioEstado(Pedido pedido, EstadoPedido anterior, EstadoPedido nuevo) {
-        applicationEventPublisher.publishEvent(new PedidoEstadoActualizadoEvent(
+        sujetoPedido.notificar(
                 pedido,
                 anterior,
                 nuevo,
                 "El pedido " + pedido.getId() + " ahora se encuentra en estado " + nuevo
-        ));
+        );
     }
 }

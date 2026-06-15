@@ -5,7 +5,6 @@ import com.emarket.dto.cliente.ClienteResponseDto;
 import com.emarket.entity.Cliente;
 import com.emarket.exception.RecursoNoEncontradoException;
 import com.emarket.exception.UsuarioYaExisteException;
-import com.emarket.factory.UsuarioFactory;
 import com.emarket.mapper.ClienteMapper;
 import com.emarket.repository.ClienteRepository;
 import com.emarket.repository.UsuarioRepository;
@@ -13,6 +12,7 @@ import com.emarket.entity.Permiso;
 import com.emarket.service.interfaz.AuthService;
 import com.emarket.service.interfaz.ClienteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,15 +23,23 @@ public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
-    private final UsuarioFactory usuarioFactory;
     private final AuthService authService;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ClienteResponseDto registrar(ClienteRequestDto dto) {
         if (usuarioRepository.existsByUsername(dto.username())) {
             throw new UsuarioYaExisteException("El username ya está registrado");
         }
-        Cliente guardado = clienteRepository.save(usuarioFactory.crearCliente(dto));
+
+        Cliente nuevoCliente = ClienteMapper.toEntity(dto);
+
+        nuevoCliente.setPassword(passwordEncoder.encode(dto.password()));
+
+        nuevoCliente.asignarPermisoCliente();
+
+        Cliente guardado = clienteRepository.save(nuevoCliente);
         return ClienteMapper.toResponseDto(guardado);
     }
 
