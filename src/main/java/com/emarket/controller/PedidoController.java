@@ -3,6 +3,7 @@ package com.emarket.controller;
 import com.emarket.dto.api.ApiResponseDto;
 import com.emarket.dto.notificacion.NotificacionResponseDto;
 import com.emarket.dto.pedido.PedidoResponseDto;
+import com.emarket.entity.EstadoPedido;
 import com.emarket.service.interfaz.PedidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,11 @@ public class PedidoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<PedidoResponseDto> listarPedidos(@RequestHeader("Authorization") String authorization) {
-        return pedidoService.listarPedidos(authorization);
+    public List<PedidoResponseDto> listarPedidos(
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam(required = false) EstadoPedido estado
+    ) {
+        return pedidoService.listarPedidos(authorization, estado);
     }
 
     @PutMapping("/{id}/estado/siguiente")

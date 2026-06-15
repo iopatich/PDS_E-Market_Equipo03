@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface VarianteProductoRepository extends JpaRepository<VarianteProducto, Long> {
     List<VarianteProducto> findAllByActivoTrue();
+    List<VarianteProducto> findAllByProductoIdAndActivoTrue(Long productoId);
 }

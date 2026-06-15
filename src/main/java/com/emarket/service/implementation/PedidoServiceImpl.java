@@ -79,9 +79,13 @@ public class PedidoServiceImpl implements PedidoService, SujetoPedido {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PedidoResponseDto> listarPedidos(String token) {
+    public List<PedidoResponseDto> listarPedidos(String token, EstadoPedido estado) {
         authService.validarPermiso(token, Permiso.ACTUALIZAR_ESTADO_PEDIDO);
-        return pedidoRepository.findAllByOrderByFechaCreacionDesc().stream()
+        List<Pedido> pedidos = estado == null
+                ? pedidoRepository.findAllByOrderByFechaCreacionDesc()
+                : pedidoRepository.findByEstadoActualOrderByFechaCreacionDesc(estado);
+
+        return pedidos.stream()
                 .map(PedidoMapper::toResponseDto)
                 .toList();
     }

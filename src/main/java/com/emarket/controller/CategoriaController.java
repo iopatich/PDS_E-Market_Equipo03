@@ -42,6 +42,12 @@ public class CategoriaController {
         return categoriaService.listar();
     }
 
+    @GetMapping("/{id}/precio-total")
+    @ResponseStatus(HttpStatus.OK)
+    public Double obtenerPrecioTotal(@PathVariable Long id) {
+        return categoriaService.obtenerPrecioTotal(id);
+    }
+
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<ApiResponseDto<CategoriaResponseDto>> eliminar(
             @PathVariable Long id,

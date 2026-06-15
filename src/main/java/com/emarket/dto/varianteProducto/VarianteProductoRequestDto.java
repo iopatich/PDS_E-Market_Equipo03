@@ -3,7 +3,7 @@ package com.emarket.dto.varianteProducto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public record VarianteProductoRequestDto(
         @NotBlank(message = "El color es obligatorio")
@@ -14,7 +14,7 @@ public record VarianteProductoRequestDto(
         Integer stock,
 
         @NotNull(message = "El precio es obligatorio")
-        @Positive(message = "El precio debe ser mayor a cero")
+        @PositiveOrZero(message = "El precio adicional debe ser mayor o igual a cero")
         Double precio,
 
         @NotNull(message = "El id de producto es obligatorio")
