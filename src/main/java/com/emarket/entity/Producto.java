@@ -17,7 +17,7 @@ public class Producto extends ComponenteCatalogo {
     @Column(name = "precio_base", nullable = false)
     private Double precioBase;
 
-    @Column(name = "url_imagen", columnDefinition = "TEXT")
+    @Column(name = "url_imagen", columnDefinition = "LONGTEXT")
     private String urlImagen;
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
