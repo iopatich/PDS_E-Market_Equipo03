@@ -15,6 +15,7 @@ public class ProductoMapper {
         producto.setNombre(dto.nombre());
         producto.setDescripcion(dto.descripcion());
         producto.setPrecioBase(dto.precioBase());
+        producto.setUrlImagen(dto.urlImagen());
         producto.setCategoriaPadre(categoriaPadre);
 
         return producto;
@@ -26,7 +27,8 @@ public class ProductoMapper {
                     producto.getNombre(),
                     producto.getDescripcion(),
                     producto.getPrecioBase(),
-                    producto.getCategoriaPadre() != null ? producto.getCategoriaPadre().getNombre() : null
+                    producto.getCategoriaPadre() != null ? producto.getCategoriaPadre().getNombre() : null,
+                    producto.getUrlImagen()
             );
     }
 

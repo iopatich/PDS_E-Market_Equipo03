@@ -128,6 +128,15 @@ La aplicación web estará disponible en:
 
 Desde allí se puede navegar el catálogo, registrarse, iniciar sesión, gestionar el carrito, finalizar compras y —en el caso de administradores— acceder al panel de gestión en `/admin`.
 
+**Credenciales del administrador inicial** (creado automáticamente al primer arranque):
+
+| Campo | Valor |
+|-------|-------|
+| Usuario | `admin` |
+| Contraseña | `admin123` |
+
+Ingresá en [http://localhost:3000/ingresar](http://localhost:3000/ingresar) y luego accedé a **Administración → Administradores** para dar de alta otros administradores desde el panel.
+
 #### D. Módulos de la API REST
 
 | Módulo | Ruta base | Descripción |
@@ -158,7 +167,7 @@ PDS_E-Market_Equipo03/
 │   ├── pago/                      # Patrón Strategy (métodos de pago)
 │   ├── notificacion/              # Patrón Observer (eventos de pedido)
 │   ├── factory/                   # Patrón Factory (usuarios)
-│   └── config/                    # Configuración y carga inicial del catálogo
+│   └── config/                    # Configuración y carga inicial (catálogo y admin)
 ├── frontend/                      # SPA React + TypeScript
 │   └── src/
 │       ├── pages/                 # Vistas (cliente y admin)
@@ -176,6 +185,21 @@ Al iniciar el backend por primera vez, se ejecuta automáticamente una carga de 
 
 + `EMARKET_CATALOGO_CARGAR_INICIAL`: habilita o deshabilita la carga automática.
 + `EMARKET_CATALOGO_FORZAR_RECARGA`: fuerza la recarga del catálogo, eliminando los datos previos.
+
+## Administrador Inicial
+
+Si no existe ningún administrador activo en la base de datos, el backend crea uno automáticamente al arrancar. Las credenciales por defecto son:
+
++ **Usuario:** `admin`
++ **Contraseña:** `admin123`
+
+Se pueden personalizar con estas variables (en `.env` o en el servicio `backend` de Docker Compose):
+
++ `EMARKET_ADMIN_CARGAR_INICIAL`: habilita o deshabilita la creación automática (default: `true`).
++ `EMARKET_ADMIN_USERNAME`: nombre de usuario del administrador inicial (default: `admin`).
++ `EMARKET_ADMIN_PASSWORD`: contraseña del administrador inicial (default: `admin123`).
+
+Una vez dentro del panel de administración, en **Administradores** podés crear nuevos administradores con el botón **Nuevo administrador**. Solo un administrador autenticado puede registrar otros administradores cuando ya existe al menos uno en el sistema.
 
 ## Estados del Pedido
 

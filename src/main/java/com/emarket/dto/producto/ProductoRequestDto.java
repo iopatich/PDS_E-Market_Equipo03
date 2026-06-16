@@ -19,5 +19,7 @@ public record ProductoRequestDto (
 
         @NotNull(message = "La categoria es obligatoria")
         @Min(value = 1, message = "El id de categoria debe ser mayor o igual a 1")
-        Long idCategoriaPadre
+        Long idCategoriaPadre,
+
+        String urlImagen
 ) {}
