@@ -5,7 +5,8 @@ public record ProductoResponseDto(
         String nombre,
         String descripcion,
         Double precioBase,
-        String nombreCategoriaPadre
+        String nombreCategoriaPadre,
+        String urlImagen
 
 ) {
 }
