@@ -44,6 +44,16 @@ public class VarianteProductoController {
         return varianteProductoService.listar();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<VarianteProductoResponseDto>> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody VarianteProductoRequestDto dto,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        VarianteProductoResponseDto varianteProductoActualizada = varianteProductoService.actualizar(id, dto, authorization);
+        return ResponseEntity.ok(new ApiResponseDto<>("Variante actualizada", varianteProductoActualizada));
+    }
+
     @PutMapping("/reducirstock/{id}")
     public ResponseEntity<ApiResponseDto<VarianteProductoResponseDto>> reducirStock(
             @PathVariable Long id,

@@ -15,12 +15,14 @@ public class Categoria extends ComponenteCatalogo {
     @Override
     public Double calcularPrecio() {
         Double precioTotal = 0.0;
+        if (elementos == null) {
+            return precioTotal;
+        }
 
-        // Magia polimórfica: recorre la lista sin preguntar qué son
         for (ComponenteCatalogo elemento : elementos) {
-            // Si el elemento es un Producto, devuelve su precio.
-            // Si el elemento es OTRA Categoría, volverá a entrar a este mismo ciclo for por dentro.
-            precioTotal += elemento.calcularPrecio();
+            if (Boolean.TRUE.equals(elemento.getActivo())) {
+                precioTotal += elemento.calcularPrecio();
+            }
         }
 
         return precioTotal;

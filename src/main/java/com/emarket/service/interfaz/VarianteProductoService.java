@@ -9,6 +9,7 @@ import java.util.List;
 public interface VarianteProductoService {
     VarianteProductoResponseDto crear(VarianteProductoRequestDto dto, String token);
     List<VarianteProductoResponseDto> listar();
+    VarianteProductoResponseDto actualizar(Long id, VarianteProductoRequestDto dto, String token);
     VarianteProductoResponseDto eliminar(Long id, String token);
     Double calcularPrecioFinal(VarianteProducto variante);
     VarianteProductoResponseDto reducirStock(Long id, Integer cantidad, String token);

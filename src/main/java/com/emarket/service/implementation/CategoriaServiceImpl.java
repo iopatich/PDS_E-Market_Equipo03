@@ -11,6 +11,7 @@ import com.emarket.service.interfaz.AuthService;
 import com.emarket.service.interfaz.CategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     private final AuthService authService;
 
     @Override
+    @Transactional
     public CategoriaResponseDto crear(CategoriaRequestDto dto, String token) {
         authService.validarPermiso(token, Permiso.CARGAR_PRODUCTO);
         Categoria padre = null;
@@ -35,6 +37,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoriaResponseDto> listar() {
         return categoriaRepo.findAllByActivoTrue().
                 stream()
@@ -43,10 +46,29 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Double obtenerPrecioTotal(Long id) {
+        Categoria categoria = buscarCategoriaActiva(id);
+        return categoria.calcularPrecio();
+    }
+
+    @Override
+    @Transactional
     public CategoriaResponseDto eliminar(Long id, String token) {
         authService.validarPermiso(token, Permiso.GESTIONAR_PRODUCTOS);
-        Categoria categoria = categoriaRepo.findById(id).orElseThrow();
+        Categoria categoria = buscarCategoriaActiva(id);
         categoria.setActivo(false);
         return CategoriaMapper.toResponseDto(categoriaRepo.save(categoria));
+    }
+
+    private Categoria buscarCategoriaActiva(Long id) {
+        Categoria categoria = categoriaRepo.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "No se ha encontrado la categoria con el id " + id
+                ));
+        if (!Boolean.TRUE.equals(categoria.getActivo())) {
+            throw new RecursoNoEncontradoException("La categoria seleccionada no se encuentra disponible");
+        }
+        return categoria;
     }
 }

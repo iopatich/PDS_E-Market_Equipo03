@@ -49,6 +49,20 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      EMARKET_ADMIN_USERNAME: ${EMARKET_ADMIN_USERNAME:-admin}
+      EMARKET_ADMIN_PASSWORD: ${EMARKET_ADMIN_PASSWORD:-admin123}
+
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: react-frontend
+
+    depends_on:
+      - backend
+
+    ports:
+      - "${FRONT_PORT}:80"
 
     restart: unless-stopped
 
