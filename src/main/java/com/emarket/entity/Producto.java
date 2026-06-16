@@ -17,10 +17,13 @@ public class Producto extends ComponenteCatalogo {
     @Column(name = "precio_base", nullable = false)
     private Double precioBase;
 
+    @Column(name = "url_imagen", columnDefinition = "TEXT")
+    private String urlImagen;
+
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<VarianteProducto> variantes;
 
-    @Override
+     @Override
     public Double calcularPrecio() {
         return this.getPrecioBase();
     }

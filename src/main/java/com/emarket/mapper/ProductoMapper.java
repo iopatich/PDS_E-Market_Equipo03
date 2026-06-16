@@ -1,9 +1,12 @@
 package com.emarket.mapper;
 
+import com.emarket.dto.producto.ProductoDetalleResponseDto;
 import com.emarket.dto.producto.ProductoRequestDto;
 import com.emarket.dto.producto.ProductoResponseDto;
+import com.emarket.dto.varianteProducto.VarianteProductoResponseDto;
 import com.emarket.entity.Categoria;
 import com.emarket.entity.Producto;
+import java.util.List;
 
 public class ProductoMapper {
         private ProductoMapper() {
@@ -16,6 +19,7 @@ public class ProductoMapper {
         producto.setDescripcion(dto.descripcion());
         producto.setPrecioBase(dto.precioBase());
         producto.setCategoriaPadre(categoriaPadre);
+        producto.setUrlImagen(dto.urlImagen());
 
         return producto;
     }
@@ -26,7 +30,22 @@ public class ProductoMapper {
                     producto.getNombre(),
                     producto.getDescripcion(),
                     producto.getPrecioBase(),
-                    producto.getCategoriaPadre() != null ? producto.getCategoriaPadre().getNombre() : null
+                    producto.getCategoriaPadre() != null ? producto.getCategoriaPadre().getNombre() : null,
+                    producto.getUrlImagen()
+            );
+    }
+
+    public static ProductoDetalleResponseDto toDetalleResponseDto(
+            Producto producto,
+            List<VarianteProductoResponseDto> variantes
+    ) {
+            return new ProductoDetalleResponseDto(
+                    producto.getId(),
+                    producto.getNombre(),
+                    producto.getDescripcion(),
+                    producto.getPrecioBase(),
+                    producto.getCategoriaPadre() != null ? producto.getCategoriaPadre().getNombre() : null,
+                    variantes
             );
     }
 

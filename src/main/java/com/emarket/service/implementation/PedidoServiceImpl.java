@@ -27,16 +27,11 @@ public class PedidoServiceImpl implements PedidoService, SujetoPedido {
     private final PedidoRepository pedidoRepository;
     private final NotificacionRepository notificacionRepository;
     private final AuthService authService;
-
-    // --- DEPENDENCIAS DE LOS OBSERVADORES ---
     private final EmailNotificacionObserver emailObserver;
     private final SmsNotificacionObserver smsObserver;
     private final PushNotificacionObserver pushObserver;
-
-    // --- 1. ESTRUCTURA CLÁSICA DEL PATRÓN OBSERVER ---
     private List<ObservadorPedido> observadores = new ArrayList<>();
 
-    // Simulamos que el sistema "suscribe" a los interesados al arrancar
     @PostConstruct
     public void inicializarSuscripciones() {
         adjuntar(emailObserver);
@@ -58,12 +53,10 @@ public class PedidoServiceImpl implements PedidoService, SujetoPedido {
 
     @Override
     public void notificar(Pedido pedido, EstadoPedido anterior, EstadoPedido nuevo, String mensaje) {
-        // EL FAMOSO CICLO FOR QUE PIDE LA CÁTEDRA
         for (ObservadorPedido observador : observadores) {
             observador.actualizar(pedido, anterior, nuevo, mensaje);
         }
     }
-    // --------------------------------------------------
 
     @Override
     @Transactional(readOnly = true)
@@ -79,9 +72,13 @@ public class PedidoServiceImpl implements PedidoService, SujetoPedido {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PedidoResponseDto> listarPedidos(String token) {
+    public List<PedidoResponseDto> listarPedidos(String token, EstadoPedido estado) {
         authService.validarPermiso(token, Permiso.ACTUALIZAR_ESTADO_PEDIDO);
-        return pedidoRepository.findAllByOrderByFechaCreacionDesc().stream()
+        List<Pedido> pedidos = estado == null
+                ? pedidoRepository.findAllByOrderByFechaCreacionDesc()
+                : pedidoRepository.findByEstadoActualOrderByFechaCreacionDesc(estado);
+
+        return pedidos.stream()
                 .map(PedidoMapper::toResponseDto)
                 .toList();
     }
@@ -95,14 +92,11 @@ public class PedidoServiceImpl implements PedidoService, SujetoPedido {
 
         EstadoPedido anterior = pedido.getEstadoActual();
 
-        // Ejecución del Patrón State que arreglamos antes
         pedido.avanzarEstado();
 
         EstadoPedido nuevo = pedido.getEstadoActual();
         Pedido actualizado = pedidoRepository.save(pedido);
 
-        // --- 2. EJECUCIÓN DEL PATRÓN OBSERVER ---
-        // En lugar de usar applicationEventPublisher, llamamos al método notificar()
         String mensajeAviso = "El pedido " + actualizado.getId() + " cambio de estado: " + anterior + " -> " + nuevo;
         notificar(actualizado, anterior, nuevo, mensajeAviso);
 
