@@ -36,8 +36,6 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> items = new ArrayList<>();
 
-    // --- 1. AGREGADO PARA EL PATRÓN STATE CLÁSICO ---
-    // @Transient evita que JPA intente crear una columna en la tabla 'pedidos' para este objeto
     @Transient
     private EstadoPedidoState estadoState;
 
@@ -46,23 +44,17 @@ public class Pedido {
         item.setPedido(this);
     }
 
-    // --- 2. MÉTODOS DEL PATRÓN STATE ---
-
-    // Este es el método que actúa como "Contexto" delegando la acción
     public void avanzarEstado() {
         if (this.estadoState == null) {
             inicializarEstado();
         }
-        // Delegación Polimórfica (El Bad Smell del switch desaparece aquí)
         this.estadoState.siguienteEstado(this);
     }
 
-    // Permite que el Estado Concreto actualice el estado del Contexto
     public void setEstadoState(EstadoPedidoState estadoState) {
         this.estadoState = estadoState;
     }
 
-    // Rehidrata el objeto State basándose en lo que trajimos de la Base de Datos
     public void inicializarEstado() {
         if (this.estadoActual == null) return;
 
