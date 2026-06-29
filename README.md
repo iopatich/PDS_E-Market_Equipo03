@@ -47,7 +47,6 @@ Se han integrado los siguientes patrones para resolver problemas específicos de
 + **Observer:** Implementado para el sistema de notificaciones automáticas ante cambios de estado en los pedidos (mediante eventos de Spring).
 + **State:** Aplicado para manejar la lógica de negocio según el estado actual del pedido (Pendiente, Pagado, Enviado, Entregado).
 + **Composite:** Aplicado en el modelado del catálogo, permitiendo tratar categorías y productos de forma uniforme mediante `ComponenteCatalogo`.
-+ **Factory (Simple Factory):** Centraliza la creación de instancias de `Cliente` y `Administrador` a través de `UsuarioFactory`.
 
 ## Stack Tecnológico
 
@@ -166,7 +165,6 @@ PDS_E-Market_Equipo03/
 │   ├── pedido/                    # Patrón State
 │   ├── pago/                      # Patrón Strategy (métodos de pago)
 │   ├── notificacion/              # Patrón Observer (eventos de pedido)
-│   ├── factory/                   # Patrón Factory (usuarios)
 │   └── config/                    # Configuración y carga inicial (catálogo y admin)
 ├── frontend/                      # SPA React + TypeScript
 │   └── src/
